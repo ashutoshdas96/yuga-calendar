@@ -17,6 +17,41 @@ const INC = 1296;
 const ANCHOR = -3102
 const ANCHOR_CELL = 34
 
+
+const getYugaSvgData = (age) => {
+  let up, down, segs, fill;
+  switch (age) {
+    case "golden-age":
+      segs = 4;
+      up = 1;
+      down = 5;
+      fill = GOLDEN_COLOR;
+      break;
+    case "silver-age":
+      segs = 3;
+      up = 18;
+      down = 9;
+      fill = SILVER_COLOR;
+      break;
+    case "bronze-age":
+      segs = 2;
+      up = 16;
+      down = 12;
+      fill = BRONZE_COLOR;
+      break;
+    case "iron-age":
+      segs = 1;
+      up = 15;
+      down = 14;
+      fill = IRON_COLOR;
+      break;
+    default:
+      fill = "rgba(255, 255, 255, 1)"
+      break;
+  }
+  return {up, down, segs, fill};
+}
+
 // month map
 const mm = {
   0: "JAN",
@@ -99,22 +134,22 @@ const getTag = (num) => {
 }
 
 const JOURNEY = {
-  b_1: { age: "", yr: ""},
-  b_10: { age: "", yr: ""},
-  b_100: { age: "", yr: ""},
-  b_1_000: { age: "", yr: ""},
-  b_10_000: { age: "", yr: ""},
-  b_100_000: { age: "", yr: ""},
+  b_1: { age: "", yr: "", cell: 0},
+  b_10: { age: "", yr: "", cell: 0},
+  b_100: { age: "", yr: "", cell: 0},
+  b_1_000: { age: "", yr: "", cell: 0},
+  b_10_000: { age: "", yr: "", cell: 0},
+  b_100_000: { age: "", yr: "", cell: 0},
 }
 
-const Calaendar = () => {
-  const centerX = 300
-  const centerY = 300
-  const radius = 250
-  const segments = 20
+const centerX = 300
+const centerY = 300
+const radius = 250
+const segments = 20
 
-  const turns = 5;
-  
+const turns = 5;
+
+const Calaendar = () => {
   const [selectedCell, setSelectedCell] = useState(null);
 
   const [masterData, setMasterData] = useState([]);
@@ -148,8 +183,8 @@ const Calaendar = () => {
       }
       index += 1;
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index] };
-        console.log({ age: getCellAge(index), yr: masterData[index] });
+        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
         return prevJ;
       });
       return index;
@@ -165,8 +200,8 @@ const Calaendar = () => {
       }
       index -= 1;
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index] };
-        console.log({ age: getCellAge(index), yr: masterData[index] });
+        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
         return prevJ;
       });
       return index;
@@ -183,8 +218,8 @@ const Calaendar = () => {
         setAnchorCell(prev);
       }
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index] };
-        console.log({ age: getCellAge(index), yr: masterData[index] });
+        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
         return prevJ;
       });
       return index;
@@ -201,8 +236,8 @@ const Calaendar = () => {
         setAnchorCell(prev);
       }
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index] };
-        console.log({ age: getCellAge(index), yr: masterData[index] });
+        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
         return prevJ;
       });
       return index;
@@ -220,8 +255,8 @@ const Calaendar = () => {
         setSelectedCell(index);
         setAnchorCell(index);
         setJourney((prevJ) => {
-          prevJ[getTag(nextFactor)] = { age: getCellAge(index), yr: masterData[selectedCell] };
-          console.log({ age: getCellAge(index), yr: masterData[selectedCell] });
+          prevJ[getTag(nextFactor)] = { age: getCellAge(index), yr: masterData[selectedCell], cell: index };
+          console.log({ age: getCellAge(index), yr: masterData[selectedCell], cell: index });
           return prevJ;
         });
       }
@@ -230,27 +265,33 @@ const Calaendar = () => {
   }, [masterData, selectedCell]);
 
   const handleYugaOut = useCallback(() => {
-    
+    setFactor((prevFactor) => {
+      let nextFactor = prevFactor / 10
+      if (nextFactor < 1) {
+        nextFactor = prevFactor;
+      } else {
+        setJourney((prevJ) => {
+          let lastJ = prevJ[getTag(nextFactor)];
+          setAnchor(lastJ.yr);
+          setSelectedCell(lastJ.cell);
+          setAnchorCell(lastJ.cell);
+          console.log("OUT: ", { age: lastJ.age, yr: lastJ.yr, cell: lastJ.cell });
+          prevJ[getTag(prevFactor)] = { age: "", yr: "", cell: 0 };
+          return prevJ;
+        });
+      }
+      return nextFactor;
+    });
   }, []);
 
   const handleCellClick = useCallback((index) => {
     setSelectedCell(index);
     setJourney((prev) => {
-      prev[getTag(factor)] = { age: getCellAge(index), yr: masterData[index] };
-      console.log({ age: getCellAge(index), yr: masterData[index] });
+      prev[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
+      console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
       return prev;
     });
   }, [masterData, factor]);
-
-  // useEffect(() => {
-  //   if (selectedCell) {
-  //     setJourney((prev) => {
-  //       prev[getTag(factor)] = { age: getCellAge(selectedCell), yr: masterData[selectedCell] };
-  //       console.log({ age: getCellAge(selectedCell), yr: masterData[selectedCell] });
-  //       return prev;
-  //     });
-  //   }
-  // }, [selectedCell, factor]);
 
   useEffect(() => {
     const down = (event) => {
@@ -416,38 +457,9 @@ const Calaendar = () => {
     })
   }
 
-  const getYugaLines = (type) => {
-    let up, down, segs, fill;
-    switch (type) {
-      case "golden-age":
-        segs = 4;
-        up = 1;
-        down = 5;
-        fill = GOLDEN_COLOR;
-        break;
-      case "silver-age":
-        segs = 3;
-        up = 18;
-        down = 9;
-        fill = SILVER_COLOR;
-        break;
-      case "bronze-age":
-        segs = 2;
-        up = 16;
-        down = 12;
-        fill = BRONZE_COLOR;
-        break;
-      case "iron-age":
-        segs = 1;
-        up = 15;
-        down = 14;
-        fill = IRON_COLOR;
-        break;
-      default:
-        fill = "rgba(255, 255, 255, 1)"
-        break;
-    }
-
+  const getYugaCells = (type) => {
+    let { up, down, segs, fill } = getYugaSvgData(type);
+    
     return (
       <>
       <path
@@ -474,10 +486,10 @@ const Calaendar = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white select-none">
       <svg width="100%" height="100%" viewBox="0 0 600 600" className="max-w-screen relative">
 
-        {getYugaLines("golden-age")}
-        {getYugaLines("silver-age")}
-        {getYugaLines("bronze-age")}
-        {getYugaLines("iron-age")}
+        {getYugaCells("golden-age")}
+        {getYugaCells("silver-age")}
+        {getYugaCells("bronze-age")}
+        {getYugaCells("iron-age")}
 
 
         {/* Orange spirals */}
