@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 
+/**
+ * BASE CYCLE
+ * Golden Age: 5184 yrs   72°
+ * Silver Age: 3888 yrs   54°
+ * Bronze Age: 2592 yrs   36°
+ * Iron Age  : 1296 yrs   18°
+ * 
+ * Total     : 12960 yrs  180°
+ * Maha Yuga : 25920 yrs  360°
+ * 
+ * Base/1000 is of significant importance.
+ */
+
 
 function formatToString(num, fix = 3) {
   // caling Number() removes decimal 00 in num representations
@@ -148,6 +161,10 @@ const radius = 250
 const segments = 20
 
 const turns = 5;
+
+
+
+
 
 const Calaendar = () => {
   const [selectedCell, setSelectedCell] = useState(null);
@@ -437,26 +454,6 @@ const Calaendar = () => {
     );
   }
 
-  const generateRadialLines = (count) => {
-    return Array.from({ length: count }, (_, i) => {
-      const angle = -(i / count) * Math.PI * 2
-      const x2 = centerX + radius * Math.cos(angle)
-      const y2 = centerY + radius * Math.sin(angle)
-      return (
-        <line
-          key={i}
-          x1={centerX}
-          y1={centerY}
-          x2={x2}
-          y2={y2}
-          stroke="#00FF00"
-          strokeWidth="1"
-          className="cursor-pointer"
-        />
-      )
-    })
-  }
-
   const getYugaCells = (type) => {
     let { up, down, segs, fill } = getYugaSvgData(type);
     
@@ -491,22 +488,14 @@ const Calaendar = () => {
         {getYugaCells("bronze-age")}
         {getYugaCells("iron-age")}
 
-
-        {/* Orange spirals */}
+        
         {generateSpiral()}
-
-        {/* White circles */}
-        <circle cx={centerX} cy={centerY} r={radius * 0.23} stroke="white" strokeWidth="1" fill="black" />
-
-        {/* Radial lines */}
-        {generateRadialLines(segments)}
-
-
+        <YugaLines />
 
         {/* Central text */}
-        <text x={centerX} y={centerY} textAnchor="middle" fill="white" fontSize="10">
+        {/* <text x={centerX} y={centerY} textAnchor="middle" fill="white" fontSize="10">
           <tspan x={centerX} dy="-1em">GOLDEN AGE</tspan>
-        </text>
+        </text> */}
 
         {/* Highlight selected segment */}
         {/* {selectedSegment !== null && (
@@ -568,5 +557,105 @@ const Calaendar = () => {
     </div>
   )
 };
+
+
+
+
+
+const YugaLines = () => {
+  const count = segments;
+  const r1 = radius * 0.23;
+  const r2 = r1+10;
+  const a1 = -234, a2 = -90, a3 = -306, a4 = -162, a5 = -18;
+
+  const getGoldenText = (a) => {
+    return (
+      <text
+        transform={`translate(${centerX + r2 * Math.cos(a * Math.PI / 180)}, ${centerY + r2 * Math.sin(a * Math.PI / 180)}) rotate(${a-90})`}
+        textAnchor="middle"
+        fill={GOLDEN_COLOR_SOLID}
+        fontSize="7"
+        className="pointer-events-none font-bold"
+      >
+        <tspan x="-0.6em" dy="-0.5em">{jm.GU}</tspan>
+        <tspan x="0.7em" dy="0">{jm.GD}</tspan>
+      </text>
+    );
+  }
+
+  const getIronText = (a) => {
+    return (
+      <text
+      transform={`translate(${centerX + r2 * Math.cos(a * Math.PI / 180)}, ${centerY + r2 * Math.sin(a * Math.PI / 180)}) rotate(${a-90})`}
+        textAnchor="middle"
+        fill={IRON_COLOR_SOLID}
+        fontSize="7"
+        className="pointer-events-none"
+      >
+        <tspan x="-0.4em" dy="-0.5em">{jm.ID}</tspan>
+        <tspan x="0.6em" dy="0">{jm.IU}</tspan>
+      </text>
+    );
+  }
+
+  return (
+    <>
+      <circle cx={centerX} cy={centerY} r={r2} stroke="white" strokeWidth="1" fill="black" />
+      <circle cx={centerX} cy={centerY} r={r1} stroke="white" strokeWidth="1" fill="black" />
+      { Array.from({ length: count }, (_, i) => {
+          const angle = -(i / count) * Math.PI * 2;
+          const x2 = centerX + radius * Math.cos(angle);
+          const y2 = centerY + radius * Math.sin(angle);
+          const stroke = i % 2 ? "#00FF00" : "#FF0000";
+          return (
+            <line
+              key={i}
+              x1={centerX}
+              y1={centerY}
+              x2={x2}
+              y2={y2}
+              stroke={stroke}
+              strokeWidth="1"
+              className="cursor-pointer"
+            />
+          );
+        })
+      }
+      <path 
+        d={`M ${centerX + r1 * Math.cos(a1 * Math.PI / 180)} ${centerY + r1 * Math.sin(a1 * Math.PI / 180)}
+          L ${centerX + r1 * Math.cos(a2 * Math.PI / 180)} ${centerY + r1 * Math.sin(a2 * Math.PI / 180)}
+          L ${centerX + r1 * Math.cos(a3 * Math.PI / 180)} ${centerY + r1 * Math.sin(a3 * Math.PI / 180)}
+          L ${centerX + r1 * Math.cos(a4 * Math.PI / 180)} ${centerY + r1 * Math.sin(a4 * Math.PI / 180)}
+          L ${centerX + r1 * Math.cos(a5 * Math.PI / 180)} ${centerY + r1 * Math.sin(a5 * Math.PI / 180)}
+          Z`}
+        stroke="#FFFFFF"
+        strokeWidth="1"
+      />
+      {getGoldenText(a1)}
+      {getGoldenText(a2)}
+      {getGoldenText(a3)}
+      {getGoldenText(a4)}
+      {getGoldenText(a5)}
+
+      {getGoldenText(-a1)}
+      {getGoldenText(-a2)}
+      {getGoldenText(-a3)}
+      {getGoldenText(-a4)}
+      {getGoldenText(-a5)}
+
+      {getIronText(a1-18)}
+      {getIronText(a2-18)}
+      {getIronText(a3-18)}
+      {getIronText(a4-18)}
+      {getIronText(a5-18)}
+
+      {getIronText(-a1-18)}
+      {getIronText(-a2-18)}
+      {getIronText(-a3-18)}
+      {getIronText(-a4-18)}
+      {getIronText(-a5-18)}
+    </>
+  );
+}
 
 export default Calaendar;
