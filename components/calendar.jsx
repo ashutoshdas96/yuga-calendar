@@ -434,7 +434,7 @@ const Calaendar = () => {
             transform={`translate(${(a_x+b_x)/2}, ${(a_y+b_y)/2}) rotate(${Math.atan2(b_y - a_y, b_x - a_x) * 180 / Math.PI})`}
             textAnchor="middle"
             fill="white"
-            fontSize="10"
+            fontSize={i <= 14 ? (i <= 4 ? "6" : "8") : "10"}
             className="pointer-events-none"
           >
             <tspan x={0} dy="-0.3em">{formatToString(yr, 2)}</tspan>
