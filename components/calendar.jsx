@@ -23,6 +23,7 @@ import { useMouse } from "@/hooks/useMouse";
 
 export const Calaendar = () => {
   const [selectedCell, setSelectedCell] = useState(null);
+  const [hoveredCell, setHoveredCell] = useState(null);
 
   const [masterData, setMasterData] = useState([]);
 
@@ -167,6 +168,10 @@ export const Calaendar = () => {
     });
   }, [masterData, factor]);
 
+  const handleHoveredCell = useCallback((i) => {
+    setHoveredCell(i);
+  }, []);
+
   useEffect(() => {
     const down = (event) => {
       if (event.keyCode === KEY_LEFT) { // && (event.metaKey || event.ctrlKey)) {
@@ -222,11 +227,11 @@ export const Calaendar = () => {
         <p>{formatToString(yr)} {yr < 0 ? "BCE" : "CE"}</p>
         
         <p>{`${month} \t ${formatToString(date)}`}</p>
-        <p>Age: {YUGA_NAME_MAP[getCellAge(selectedCell)]}</p>
+        <p>Age: {YUGA_NAME_MAP[getCellAge(index)]}</p>
         <p>Cell: {index}</p>
       </div>
     );
-  },[masterData, selectedCell]);
+  },[masterData]);
 
   const getSysInfo = () => {
     return (
@@ -251,6 +256,23 @@ export const Calaendar = () => {
 
   const dAs = [dA, d2A];
 
+  const getHoveredData = useCallback(() => {
+    if (hoveredCell === null) return "";
+    const year = masterData[hoveredCell];
+    const yr = year + (uA % 18) * (INC / 18 / factor);
+    const {month, date} = getDate(yr);
+    
+    return (
+      <>
+        {`${YUGA_NAME_MAP[getCellAge(hoveredCell)]}
+        ${formatToString(date)}
+        ${month}
+        ${formatToString(yr)} ${yr < 0 ? "BCE" : "CE"}
+        `}
+      </>
+      );
+  }, [masterData, hoveredCell, uA]);
+
   return (
     <div className="flex flex-col items-center justify-center p-4 max-h-screen max-w-screen bg-black text-white select-none">
       <svg width="100%" height="100%" viewBox={`0 0 ${SVG_BOX} ${SVG_BOX}`} ref={ref} className="w-min h-min">
@@ -267,11 +289,30 @@ export const Calaendar = () => {
           strokeWidth="1"
         />
 
+        <path
+          id="circle-text"
+          d={`
+          M ${CENTER_X + (RADIUS + 10) * Math.cos((vad + 54) * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin((vad + 54) * Math.PI / 180)}
+          A ${(RADIUS + 10)} ${(RADIUS + 10)} 0 0 0 ${CENTER_X + (RADIUS + 10) * Math.cos((vad - 54) * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin((vad - 54)* Math.PI / 180)}`}
+          className="pointer-events-none"
+          fill="none"
+        />
+        <text
+          fill="white"
+          fontSize="10"
+        >
+          <textPath href="#circle-text" startOffset={"50%"} textAnchor="middle" alignmentBaseline="middle">
+            {getHoveredData()}
+          </textPath>
+        </text>
+
+
         <SpiralCalendar
           masterData={masterData}
           selectedCell={selectedCell}
           handleCellClick={handleCellClick} 
           handleCellDoubleClick={handleYugaIn}
+          handleHoveredCell={handleHoveredCell}
         />
         <YugaLinesSvg />
 
@@ -304,9 +345,10 @@ export const Calaendar = () => {
 
       <div className="mt-4 p-2 bg-gray-800 rounded-lg shadow-lg w-full flex flex-row items-center justify-between gap-2">
         <div className="flex flex-col items-center justify-between w-20">
-          <span>{formatToString(posX)}</span>
-          <span>{formatToString(posY)}</span>
+          {/* <span>{formatToString(posX)}</span>
+          <span>{formatToString(posY)}</span> */}
           <span>{formatToString(uA)}</span>
+          <span>{hoveredCell}</span>
           {/* <span>{pos.width}, {pos.height}</span> */}
           <span>{dSeg}, {formatToString(dA,1)}</span>
         </div>

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 
 import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
 
 import { useHover } from "@/hooks/useHover";
 
 
-export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handleCellDoubleClick}) => {
+export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handleCellDoubleClick, handleHoveredCell}) => {
   const cells = [];
 
   let path = `M ${CENTER_X} ${CENTER_Y} `
@@ -31,6 +31,7 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handl
         handleCellClick={handleCellClick}
         handleCellDoubleClick={handleCellDoubleClick}
         cells={cells}
+        handleHoveredCell={handleHoveredCell}
       />
     )
   });
@@ -45,8 +46,12 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handl
 
 
 
-const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleClick, cells}) => {
-  const [hoverRef, hovering] = useHover();  
+const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleClick, cells, handleHoveredCell}) => {
+  const [hoverRef, hovering] = useHover();
+
+  useLayoutEffect(() => {
+    if (hovering) handleHoveredCell(i);
+  }, [hovering]);
   
   let stroke = "white";
   let k = i % 20;

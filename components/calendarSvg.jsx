@@ -23,7 +23,7 @@ export const YugaLinesSvg = () => {
   const getIronText = (a) => {
     return (
       <text
-      transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
+        transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
         textAnchor="middle"
         fill={IRON_COLOR_SOLID}
         fontSize="7"
