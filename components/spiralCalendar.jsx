@@ -67,13 +67,14 @@ const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleCli
   return (
     <>
       <path
+        ref={hoverRef}
         key={i}
         d={`M ${a_x} ${a_y}
         L ${b_x} ${b_y} 
         L ${c_x} ${c_y}
         L ${d_x} ${d_y}
         Z`}
-        fill={`rgba(255, 255, 255, ${i === selectedCell ? 0.2 : 0})`}
+        fill={`rgba(255, 255, 255, ${i === selectedCell ? 0.2 : hovering ? 0.1 : 0})`}
         stroke={stroke}
         strokeWidth="1"
         className="cursor-pointer"

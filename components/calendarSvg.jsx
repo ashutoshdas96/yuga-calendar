@@ -45,7 +45,7 @@ export const YugaLinesSvg = () => {
           const x2 = CENTER_X + RADIUS * Math.cos(angle);
           const y2 = CENTER_Y + RADIUS * Math.sin(angle);
           const stroke = i % 10 
-            ? "rgba(255, 255, 255, 0.1)"
+            ? `rgba(255, 255, 255, ${i % 2 ? 0.1 : 0.16})`
             : i/10 % 2 ? "#00FF00" : "#FF0000";
           const strokeWidth = i % 10 ? 0.5 : 1;
           return (
