@@ -8,16 +8,17 @@
  * Total     : 12960 yrs  180°
  * Maha Yuga : 25920 yrs  360°
  * 
- * Base/1000 is of significant importance.
+ * Base/1000.
  */
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, JOURNEY, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
 
+import { useMouse } from "@/hooks/useMouse";
 
 
 export const Calaendar = () => {
@@ -31,6 +32,8 @@ export const Calaendar = () => {
   const [anchorCell, setAnchorCell] = useState(ANCHOR_CELL);
 
   const [journey, setJourney] = useState(JOURNEY);
+
+  const [pos, ref] = useMouse();
 
   useEffect(() => {
     let md = [];
@@ -235,18 +238,51 @@ export const Calaendar = () => {
     );
   }
 
+  const posX = pos.elementX * SVG_BOX / pos.width;
+  const posY = pos.elementY * SVG_BOX / pos.height
+  const va = Math.atan2(posY - CENTER_Y, posX - CENTER_X);
+  const vad = va * 180 / Math.PI;
+  // base angle parseInt(yA / 18)}, {formatToString(yA % 18)
+  const uA = vad > 0 ? 360 - vad : -vad;
+  const dSeg = parseInt(uA / 18);
+  const dA = dSeg % 2 ? uA % 18 * 10 + 90 : uA % 18 * 10 + 270;
+  const d2Seg = parseInt(dA / 18);
+  const d2A = d2Seg % 2 ? dA % 18 * 10 + 90 : dA % 18 * 10 + 270;
+
+  const dAs = [dA, d2A];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white select-none">
-      <svg width="100%" height="100%" viewBox="0 0 600 600" className="max-w-screen relative">
+    <div className="flex flex-col items-center justify-center p-4 max-h-screen max-w-screen bg-black text-white select-none">
+      <svg width="100%" height="100%" viewBox={`0 0 ${SVG_BOX} ${SVG_BOX}`} ref={ref} className="w-min h-min">
 
         <SegmentBgSvg age="golden-age" />
         <SegmentBgSvg age="silver-age" />
         <SegmentBgSvg age="bronze-age" />
         <SegmentBgSvg age="iron-age" />
 
-        
-        <SpiralCalendar masterData={masterData} selectedCell={selectedCell} handleCellClick={handleCellClick} />
+        <path
+          d={`M ${CENTER_X} ${CENTER_Y}
+          L ${CENTER_X + RADIUS * Math.cos(va)} ${CENTER_X + RADIUS * Math.sin(va)}`}
+          stroke="blue"
+          strokeWidth="1"
+        />
+
+        <SpiralCalendar
+          masterData={masterData}
+          selectedCell={selectedCell}
+          handleCellClick={handleCellClick} 
+          handleCellDoubleClick={handleYugaIn}
+        />
         <YugaLinesSvg />
+
+        { Array.from(dAs, (da, i) => (
+          <path
+            d={`M ${CENTER_X} ${CENTER_Y}
+            L ${CENTER_X + R2 * Math.cos(-da * Math.PI / 180)} ${CENTER_X + R2 * Math.sin(-da * Math.PI / 180)}`}
+            stroke={YUGA_SCALE_COLOR[i]}
+            strokeWidth="3"
+          />)
+        )}
 
         {/* Central text */}
         {/* <text x={CENTER_X} y={CENTER_Y} textAnchor="middle" fill="white" fontSize="10">
@@ -256,7 +292,9 @@ export const Calaendar = () => {
         {/* Highlight selected segment */}
         {/* {selectedSegment !== null && (
           <path
-            d={`M ${CENTER_X} ${CENTER_Y} L ${CENTER_X + RADIUS * Math.cos(-selectedSegment * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-selectedSegment * 2 * Math.PI / SEGMENTS)} A ${RADIUS} ${RADIUS} 0 0 0 ${CENTER_X + RADIUS * Math.cos(-(selectedSegment + 1) * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-(selectedSegment + 1) * 2 * Math.PI / SEGMENTS)} Z`}
+            d={`M ${CENTER_X} ${CENTER_Y}
+            L ${CENTER_X + RADIUS * Math.cos(-selectedSegment * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-selectedSegment * 2 * Math.PI / SEGMENTS)}
+            A ${RADIUS} ${RADIUS} 0 0 0 ${CENTER_X + RADIUS * Math.cos(-(selectedSegment + 1) * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-(selectedSegment + 1) * 2 * Math.PI / SEGMENTS)} Z`}
             fill="rgba(255, 255, 255, 0.2)"
             stroke="white"
             strokeWidth="1"
@@ -264,7 +302,14 @@ export const Calaendar = () => {
         )} */}
       </svg>
 
-      <div className="mt-4 p-2 bg-gray-800 rounded-lg shadow-lg w-full flex flex-col items-center justify-between gap-2">
+      <div className="mt-4 p-2 bg-gray-800 rounded-lg shadow-lg w-full flex flex-row items-center justify-between gap-2">
+        <div className="flex flex-col items-center justify-between w-20">
+          <span>{formatToString(posX)}</span>
+          <span>{formatToString(posY)}</span>
+          <span>{formatToString(uA)}</span>
+          {/* <span>{pos.width}, {pos.height}</span> */}
+          <span>{dSeg}, {formatToString(dA,1)}</span>
+        </div>
         <div className="flex flex-col gap-2">
           {getJourneyInfo()}
           {/* <h2 className="text-xl font-semibold mb-2">Selected Cell</h2> */}
@@ -275,7 +320,7 @@ export const Calaendar = () => {
           )}
           {getSysInfo()}
         </div>
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4">
           <div
             className="flex flex-row gap-2"
           >

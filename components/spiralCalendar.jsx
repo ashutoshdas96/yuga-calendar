@@ -3,7 +3,7 @@ import React from "react";
 import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
 
 
-export const SpiralCalendar = ({masterData, selectedCell, handleCellClick}) => {
+export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handleCellDoubleClick}) => {
   let cells = [];
 
   let path = `M ${CENTER_X} ${CENTER_Y} `
@@ -48,8 +48,9 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick}) => {
           fill={`rgba(255, 255, 255, ${i === selectedCell ? 0.2 : 0})`}
           stroke={stroke}
           strokeWidth="1"
-          className="cursor-pointer hover:fill-white/[0.1]"
+          className="cursor-pointer"
           onClick={() => handleCellClick(i)}
+          onDoubleClick={() => handleCellDoubleClick(i)}
         />
         <text
           key={"text_" + i}

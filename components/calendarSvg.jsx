@@ -1,17 +1,14 @@
 import React from "react";
 
-import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
+import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, R1, R2, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
 
 export const YugaLinesSvg = () => {
-  const count = SEGMENTS;
-  const r1 = RADIUS * 0.23;
-  const r2 = r1+10;
   const angles = [-234, -90, -306, -162, -18];
 
   const getGoldenText = (a) => {
     return (
       <text
-        transform={`translate(${CENTER_X + r2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + r2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
+        transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
         textAnchor="middle"
         fill={GOLDEN_COLOR_SOLID}
         fontSize="7"
@@ -26,7 +23,7 @@ export const YugaLinesSvg = () => {
   const getIronText = (a) => {
     return (
       <text
-      transform={`translate(${CENTER_X + r2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + r2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
+      transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
         textAnchor="middle"
         fill={IRON_COLOR_SOLID}
         fontSize="7"
@@ -40,14 +37,17 @@ export const YugaLinesSvg = () => {
 
   return (
     <>
-      <circle cx={CENTER_X} cy={CENTER_Y} r={r2} stroke="white" strokeWidth="1" fill="black" />
-      <circle cx={CENTER_X} cy={CENTER_Y} r={r1} stroke="white" strokeWidth="1" fill="black" />
+      <circle cx={CENTER_X} cy={CENTER_Y} r={R2} stroke="white" strokeWidth="1" fill="black" />
+      <circle cx={CENTER_X} cy={CENTER_Y} r={R1} stroke="white" strokeWidth="1" fill="black" />
       
-      { Array.from({ length: count }, (_, i) => {
-          const angle = -(i / count) * Math.PI * 2;
+      { Array.from({ length: SEGMENTS * 10 }, (_, i) => {
+          const angle = -(i / SEGMENTS / 10) * Math.PI * 2;
           const x2 = CENTER_X + RADIUS * Math.cos(angle);
           const y2 = CENTER_Y + RADIUS * Math.sin(angle);
-          const stroke = i % 2 ? "#00FF00" : "#FF0000";
+          const stroke = i % 10 
+            ? "rgba(255, 255, 255, 0.1)"
+            : i/10 % 2 ? "#00FF00" : "#FF0000";
+          const strokeWidth = i % 10 ? 0.5 : 1;
           return (
             <line
               key={i}
@@ -56,8 +56,8 @@ export const YugaLinesSvg = () => {
               x2={x2}
               y2={y2}
               stroke={stroke}
-              strokeWidth="1"
-              className="cursor-pointer"
+              strokeWidth={strokeWidth}
+              className="pointer-events-none"
             />
           );
         })
@@ -65,7 +65,7 @@ export const YugaLinesSvg = () => {
 
       { Array.from({ length: 3 }, (_, i) => {
           const fac = 2.61 ** i;
-          const r = fac ? r1/fac : r1;
+          const r = fac ? R1/fac : R1;
           const rotate = i * 36;
 
           return (
@@ -83,8 +83,6 @@ export const YugaLinesSvg = () => {
         })
       }
 
-      {/* <circle cx={CENTER_X} cy={CENTER_Y} r={r1/2.61/2.61} stroke="white" strokeWidth="1" fill="none" /> */}
-
       { Array.from(angles, (a) => (
           <>
           {getGoldenText(a)}
@@ -95,6 +93,8 @@ export const YugaLinesSvg = () => {
         ))
       }
 
+      <circle cx={CENTER_X} cy={CENTER_Y} r={RADIUS} stroke="white" strokeWidth="1" fill="none" />
+      <circle cx={CENTER_X} cy={CENTER_Y} r={RADIUS + 20} stroke="white" strokeWidth="1" fill="none" />
     </>
   );
 }
