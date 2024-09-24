@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
@@ -258,16 +258,16 @@ export const Calaendar = () => {
 
   const getHoveredData = useCallback(() => {
     if (hoveredCell === null) return "";
-    const year = masterData[hoveredCell];
-    const yr = year + (uA % 18) * (INC / 18 / factor);
-    const {month, date} = getDate(yr);
+    const y = masterData[hoveredCell];
+    const yr = y + (uA % 18) * (INC / 18 / factor);
+    const {month, date, year} = getDate(yr);
     
     return (
       <>
-        {`${YUGA_NAME_MAP[getCellAge(hoveredCell)]}
-        ${formatToString(date)}
+        {`${getYugaScale(`${factor}0`)} ${YUGA_NAME_MAP[getCellAge(parseInt(dA / 18))]}
+        ${year}
         ${month}
-        ${formatToString(yr)} ${yr < 0 ? "BCE" : "CE"}
+        ${formatToString(date, 2)}
         `}
       </>
       );
@@ -288,7 +288,6 @@ export const Calaendar = () => {
           stroke="blue"
           strokeWidth="1"
         />
-
         <path
           id="circle-text"
           d={`
@@ -391,7 +390,7 @@ export const Calaendar = () => {
             <button
               type="button"
               className="h-wrap w-wrap bg-red-500 disabled:bg-gray-500 disabled:cursor-not-allowed hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full"
-              disabled={selectedCell === null}
+              disabled={factor === 1}
               onClick={() => handleYugaOut()}
             >OUT</button>
           </div>
