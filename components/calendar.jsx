@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
@@ -126,7 +126,7 @@ export const Calaendar = () => {
         nextFactor = prevFactor;
       } else {
         setAnchor(masterData[selectedCell]);
-        const index = selectedCell % 2 ? 25 : 35;
+        const index = selectedCell % 2 ? IRON_ANCHOR : GOLDEN_ANCHOR;
         setSelectedCell(index);
         setAnchorCell(index);
         setJourney((prevJ) => {
@@ -271,7 +271,7 @@ export const Calaendar = () => {
         `}
       </>
       );
-  }, [masterData, hoveredCell, uA]);
+  }, [masterData, hoveredCell, uA, factor, dA]);
 
   return (
     <div className="flex flex-col items-center justify-center p-4 max-h-screen max-w-screen bg-black text-white select-none">

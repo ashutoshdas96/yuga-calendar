@@ -10,7 +10,7 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handl
 
   let path = `M ${CENTER_X} ${CENTER_Y} `
   for (let i = 0; i <= TURNS * SEGMENTS; i++) {
-    const angle = -(i / SEGMENTS) * Math.PI * 2;
+    const angle = -(i / SEGMENTS) * Math.PI * 2 - Math.PI / 2;
     const r = (RADIUS * i) / (TURNS * SEGMENTS);
     const x = CENTER_X + r * Math.cos(angle);
     const y = CENTER_Y + r * Math.sin(angle);
