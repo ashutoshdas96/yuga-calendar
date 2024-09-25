@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
@@ -264,7 +264,7 @@ export const Calaendar = () => {
     
     return (
       <>
-        {`${getYugaScale(`${factor}0`)} ${YUGA_NAME_MAP[getCellAge(parseInt(dA / 18))]}
+        {`${YUGA_SCALE[Math.log10(factor * 10)]} ${YUGA_NAME_MAP[getCellAge(parseInt(dA / 18))]}
         ${year}
         ${month}
         ${formatToString(date, 2)}
