@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
@@ -250,9 +250,9 @@ export const Calaendar = () => {
   // base angle parseInt(yA / 18)}, {formatToString(yA % 18)
   const uA = vad > 0 ? 360 - vad : -vad;
   const dSeg = parseInt(uA / 18);
-  const dA = dSeg % 2 ? uA % 18 * 10 + 90 : uA % 18 * 10 + 270;
-  const d2Seg = parseInt(dA / 18);
-  const d2A = d2Seg % 2 ? dA % 18 * 10 + 90 : dA % 18 * 10 + 270;
+  const dA = dSeg % 2 ? uA % 18 * 10 : uA % 18 * 10 + 180;
+  const d2Seg = parseInt((dA+90) / 18);
+  const d2A = d2Seg % 2 ? dA % 18 * 10 : dA % 18 * 10 + 180;
 
   const dAs = [dA, d2A];
 
@@ -264,7 +264,7 @@ export const Calaendar = () => {
     
     return (
       <>
-        {`${YUGA_SCALE[Math.log10(factor * 10)]} ${YUGA_NAME_MAP[getCellAge(parseInt(dA / 18))]}
+        {`${YUGA_SCALE[Math.log10(factor * 10)]} ${YUGA_NAME_MAP[getCellAgeFromAngle(dA)]}
         ${year}
         ${month}
         ${formatToString(date, 2)}
@@ -318,7 +318,7 @@ export const Calaendar = () => {
         { Array.from(dAs, (da, i) => (
           <path
             d={`M ${CENTER_X} ${CENTER_Y}
-            L ${CENTER_X + R2 * Math.cos(-da * Math.PI / 180)} ${CENTER_X + R2 * Math.sin(-da * Math.PI / 180)}`}
+            L ${CENTER_X + R2 * Math.cos(-(da+90) * Math.PI / 180)} ${CENTER_X + R2 * Math.sin(-(da+90) * Math.PI / 180)}`}
             stroke={YUGA_SCALE_COLOR[i]}
             strokeWidth="3"
           />)

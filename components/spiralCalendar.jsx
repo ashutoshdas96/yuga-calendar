@@ -54,11 +54,12 @@ const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleCli
   }, [hovering]);
   
   let stroke = "white";
+  const age = getCellAge(i);
   let k = i % 20;
-  if (k >= 1 && k < 9) stroke = GOLDEN_COLOR_SOLID;
-  if ((k >= 9 && k < 12) || (k >= 18) || (k < 1)) stroke = SILVER_COLOR_SOLID;
-  if ((k >= 12 && k < 14) || (k >= 16 && k < 18)) stroke = BRONZE_COLOR_SOLID;
-  if (k >= 14 && k < 16) stroke = IRON_COLOR_SOLID;
+  if (age == "GU" || age == "GD") stroke = GOLDEN_COLOR_SOLID;
+  if (age == "SU" || age == "SD") stroke = SILVER_COLOR_SOLID;
+  if (age == "BU" || age == "BD") stroke = BRONZE_COLOR_SOLID;
+  if (age == "IU" || age == "ID") stroke = IRON_COLOR_SOLID;
 
   const a_x = cells[i].x, a_y = cells[i].y;
   const b_x = cells[i+SEGMENTS].x, b_y = cells[i+SEGMENTS].y;
