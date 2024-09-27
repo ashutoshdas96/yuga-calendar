@@ -6,7 +6,7 @@
  * Iron Age  : 1296 yrs   18°
  * 
  * Total     : 12960 yrs  180°
- * Maha Yuga : 25920 yrs  360°
+ * Chatur Yuga : 25920 yrs  360°
  * 
  * Base/1000.
  */
@@ -15,7 +15,7 @@ import React, { useState, useEffect, useCallback } from "react";
 
 import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle } from "@/lib/utils";
 
-import { YugaLinesSvg, SegmentBgSvg } from "./calendarSvg";
+import { YugaLinesSvg, SegmentBgSvg, OuterCircularTextSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
 
 import { useMouse } from "@/hooks/useMouse";
@@ -282,28 +282,11 @@ export const Calaendar = () => {
         <SegmentBgSvg age="bronze-age" />
         <SegmentBgSvg age="iron-age" />
 
-        <path
-          d={`M ${CENTER_X} ${CENTER_Y}
-          L ${CENTER_X + RADIUS * Math.cos(va)} ${CENTER_X + RADIUS * Math.sin(va)}`}
-          stroke="blue"
-          strokeWidth="1"
+        <OuterCircularTextSvg
+          radAngle={va}
+          text={getHoveredData()}
+          textFill={"white"}
         />
-        <path
-          id="circle-text"
-          d={`
-          M ${CENTER_X + (RADIUS + 10) * Math.cos((vad + 54) * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin((vad + 54) * Math.PI / 180)}
-          A ${(RADIUS + 10)} ${(RADIUS + 10)} 0 0 0 ${CENTER_X + (RADIUS + 10) * Math.cos((vad - 54) * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin((vad - 54)* Math.PI / 180)}`}
-          className="pointer-events-none"
-          fill="none"
-        />
-        <text
-          fill="white"
-          fontSize="10"
-        >
-          <textPath href="#circle-text" startOffset={"50%"} textAnchor="middle" alignmentBaseline="middle">
-            {getHoveredData()}
-          </textPath>
-        </text>
 
 
         <SpiralCalendar

@@ -100,8 +100,6 @@ export const YugaLinesSvg = () => {
 }
 
 
-
-
 export const SegmentBgSvg = ({age}) => {
   let { up, down, segs, fill } = getYugaSvgData(age);
   
@@ -125,4 +123,34 @@ export const SegmentBgSvg = ({age}) => {
     />
     </>
   )
+}
+
+export const OuterCircularTextSvg = ({radAngle, text, textFill}) => {
+
+  return (
+    <>
+    <path
+      d={`M ${CENTER_X} ${CENTER_Y}
+      L ${CENTER_X + RADIUS * Math.cos(radAngle)} ${CENTER_X + RADIUS * Math.sin(radAngle)}`}
+      stroke="blue"
+      strokeWidth="1"
+    />
+    <path
+      id="circle-text"
+      d={`
+      M ${CENTER_X + (RADIUS + 10) * Math.cos(radAngle + 54 * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin(radAngle + 54 * Math.PI / 180)}
+      A ${(RADIUS + 10)} ${(RADIUS + 10)} 0 0 0 ${CENTER_X + (RADIUS + 10) * Math.cos(radAngle - 54 * Math.PI / 180)} ${CENTER_Y + (RADIUS + 10) * Math.sin(radAngle - 54 * Math.PI / 180)}`}
+      className="pointer-events-none"
+      fill="none"
+    />
+    <text
+      fill={textFill}
+      fontSize="10"
+    >
+      <textPath href="#circle-text" startOffset={"50%"} textAnchor="middle" alignmentBaseline="middle">
+        {text}
+      </textPath>
+    </text>
+    </>
+  );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect } from "react";
 
-import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
+import { GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, formatToString, getDate, getCellAge } from "@/lib/utils";
 
 import { useHover } from "@/hooks/useHover";
 
