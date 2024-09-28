@@ -13,26 +13,44 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, JOURNEY_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, JOURNEY, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, YUGA_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg, OuterCircularTextSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
 
 import { useMouse } from "@/hooks/useMouse";
 
+// ["b_1",  "B/10", "B/100", "B/1K", "B/10K", "B/100K", "B/1M"]
+// ["b_1", "b_10", "b_100", "b_1k", "b_10k", "b_100k"]
+const MASTER_DATA = {
+  b_1: [],
+  b_10: [],
+  b_100: [],
+  b_1k: [],
+  b_10k: [],
+  b_100k: [],
+}
+
+const JOURNEY = {
+  b_1: { age: "", yr: "", cell: 0},
+  b_10: { age: "", yr: "", cell: 0},
+  b_100: { age: "", yr: "", cell: 0},
+  b_1k: { age: "", yr: "", cell: 0},
+  b_10k: { age: "", yr: "", cell: 0},
+  b_100k: { age: "", yr: "", cell: 0},
+}
+
 
 export const Calaendar = () => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [hoveredCell, setHoveredCell] = useState(null);
 
-  const [masterData, setMasterData] = useState([]);
+  const [masterData, setMasterData] = useState(MASTER_DATA);
+  const [journey, setJourney] = useState(JOURNEY);
 
-  // const [selectedSegment, setSelectedSegment] = useState("b_1");
   const [factor, setFactor] = useState(1);
   const [anchor, setAnchor] = useState(ANCHOR);
   const [anchorCell, setAnchorCell] = useState(ANCHOR_CELL);
-
-  const [journey, setJourney] = useState(JOURNEY);
 
   const [pos, ref] = useMouse();
 
@@ -46,20 +64,25 @@ export const Calaendar = () => {
       }
     }
     console.log("Master Data Changed: ", md.length, TURNS * SEGMENTS - SEGMENTS*2)
-    setMasterData(md);
+    setMasterData((old) => {
+      const newData = {...old};
+      newData[getTag(factor)] = md;
+      return newData;
+    });
   }, [factor, anchor, anchorCell]);
 
   const handleCellNext = useCallback(() => {
+    const tag = getTag(factor);
     setSelectedCell((index) => {
       if (index === 59) {
-        setAnchor(masterData[index]);
+        setAnchor(masterData[tag][index]);
         index -= 20;
         setAnchorCell(index);
       }
       index += 1;
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
-        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
+        prevJ[tag] = { age: getCellAge(index), yr: masterData[tag][index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[tag][index], cell: index });
         return prevJ;
       });
       return index;
@@ -67,16 +90,17 @@ export const Calaendar = () => {
   }, [masterData, factor]);
 
   const handleCellPrev = useCallback(() => {
+    const tag = getTag(factor);
     setSelectedCell((index) => {
       if (index === 0) {
-        setAnchor(masterData[index]);
+        setAnchor(masterData[tag][index]);
         index += 20;
         setAnchorCell(index);
       }
       index -= 1;
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
-        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
+        prevJ[tag] = { age: getCellAge(index), yr: masterData[tag][index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[tag][index], cell: index });
         return prevJ;
       });
       return index;
@@ -84,17 +108,18 @@ export const Calaendar = () => {
   }, [masterData, factor]);
 
   const handleCellUp = useCallback(() => {
+    const tag = getTag(factor);
     setSelectedCell((prev) => {
       let index = prev - 20;
       if (index < 0) {
-        setAnchor(masterData[prev]);
+        setAnchor(masterData[tag][prev]);
         prev += 20;
         index += 20;
         setAnchorCell(prev);
       }
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
-        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
+        prevJ[tag] = { age: getCellAge(index), yr: masterData[tag][index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[tag][index], cell: index });
         return prevJ;
       });
       return index;
@@ -102,17 +127,18 @@ export const Calaendar = () => {
   }, [masterData, factor]);
 
   const handleCellDown = useCallback(() => {
+    const tag = getTag(factor);
     setSelectedCell((prev) => {
       let index = prev + 20;
       if (index > 59) {
-        setAnchor(masterData[prev]);
+        setAnchor(masterData[tag][prev]);
         prev -= 20;
         index -= 20;
         setAnchorCell(prev);
       }
       setJourney((prevJ) => {
-        prevJ[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
-        console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
+        prevJ[tag] = { age: getCellAge(index), yr: masterData[tag][index], cell: index };
+        console.log({ age: getCellAge(index), yr: masterData[tag][index], cell: index });
         return prevJ;
       });
       return index;
@@ -125,13 +151,13 @@ export const Calaendar = () => {
       if (nextFactor > 100000) {
         nextFactor = prevFactor;
       } else {
-        setAnchor(masterData[selectedCell]);
+        setAnchor(masterData[getTag(prevFactor)][selectedCell]);
         const index = selectedCell % 2 ? IRON_ANCHOR : GOLDEN_ANCHOR;
         setSelectedCell(index);
         setAnchorCell(index);
         setJourney((prevJ) => {
-          prevJ[getTag(nextFactor)] = { age: getCellAge(index), yr: masterData[selectedCell], cell: index };
-          console.log({ age: getCellAge(index), yr: masterData[selectedCell], cell: index });
+          prevJ[getTag(nextFactor)] = { age: getCellAge(index), yr: masterData[getTag(prevFactor)][selectedCell], cell: index };
+          console.log({ age: getCellAge(index), yr: masterData[getTag(prevFactor)][selectedCell], cell: index });
           return prevJ;
         });
       }
@@ -160,10 +186,11 @@ export const Calaendar = () => {
   }, []);
 
   const handleCellClick = useCallback((index) => {
+    const tag = getTag(factor);
     setSelectedCell(index);
     setJourney((prev) => {
-      prev[getTag(factor)] = { age: getCellAge(index), yr: masterData[index], cell: index };
-      console.log({ age: getCellAge(index), yr: masterData[index], cell: index });
+      prev[tag] = { age: getCellAge(index), yr: masterData[tag][index], cell: index };
+      console.log({ age: getCellAge(index), yr: masterData[tag][index], cell: index });
       return prev;
     });
   }, [masterData, factor]);
@@ -208,7 +235,7 @@ export const Calaendar = () => {
   const getJourneyInfo = useCallback(() => {
     return (
       <div className="flex flex-row gap-2 justify-between">
-        {Array.from(JOURNEY_TAG, (tag) => (
+        {Array.from(YUGA_TAG, (tag) => (
           <div className="flex flex-col h-wrap w-full items-center justify-center p-2 bg-black rounded-md">
             <span>{JOURNEY_MAP[journey[tag].age]}</span>
             <span>{formatToString(journey[tag].yr, 2)}</span>
@@ -219,7 +246,7 @@ export const Calaendar = () => {
   }, [journey]);
 
   const getCellInfo = useCallback((index) => {
-    const yr = masterData[index];
+    const yr = masterData[getTag(factor)][index];
     const {month, date} = getDate(yr);
     
     return (
@@ -231,7 +258,7 @@ export const Calaendar = () => {
         <p>Cell: {index}</p>
       </div>
     );
-  },[masterData]);
+  },[masterData, factor]);
 
   const getSysInfo = () => {
     return (
@@ -258,7 +285,7 @@ export const Calaendar = () => {
 
   const getHoveredData = useCallback(() => {
     if (hoveredCell === null) return "";
-    const y = masterData[hoveredCell];
+    const y = masterData[getTag(factor)][hoveredCell];
     const yr = y + (uA % 18) * (INC / 18 / factor);
     const {month, date, year} = getDate(yr);
     
@@ -290,7 +317,7 @@ export const Calaendar = () => {
 
 
         <SpiralCalendar
-          masterData={masterData}
+          cellData={masterData[getTag(factor)]}
           selectedCell={selectedCell}
           handleCellClick={handleCellClick} 
           handleCellDoubleClick={handleYugaIn}

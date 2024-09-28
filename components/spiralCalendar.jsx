@@ -5,7 +5,7 @@ import { GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_
 import { useHover } from "@/hooks/useHover";
 
 
-export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handleCellDoubleClick, handleHoveredCell}) => {
+export const SpiralCalendar = ({cellData, selectedCell, handleCellClick, handleCellDoubleClick, handleHoveredCell}) => {
   const cells = [];
 
   let path = `M ${CENTER_X} ${CENTER_Y} `
@@ -26,7 +26,7 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handl
       <Cell
         key={i}
         i={i}
-        masterData={masterData}
+        cellData={cellData}
         selectedCell={selectedCell}
         handleCellClick={handleCellClick}
         handleCellDoubleClick={handleCellDoubleClick}
@@ -46,7 +46,7 @@ export const SpiralCalendar = ({masterData, selectedCell, handleCellClick, handl
 
 
 
-const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleClick, cells, handleHoveredCell}) => {
+const Cell = ({i, cellData, selectedCell, handleCellClick, handleCellDoubleClick, cells, handleHoveredCell}) => {
   const [hoverRef, hovering] = useHover();
 
   useLayoutEffect(() => {
@@ -67,7 +67,7 @@ const Cell = ({i, masterData, selectedCell, handleCellClick, handleCellDoubleCli
   const d_x = cells[i+1].x, d_y = cells[i+1].y;
 
   
-  const yr = masterData[i];
+  const yr = cellData[i];
   const { date, month } = getDate(yr);
 
   return (
