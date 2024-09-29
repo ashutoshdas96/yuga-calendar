@@ -13,7 +13,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import { YUGA_NAME_MAP, JOURNEY_MAP, YUGA_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle } from "@/lib/utils";
+import { YUGA_NAME_MAP, JOURNEY_MAP, YUGA_TAG, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, SVG_BOX, RADIUS, R1, R2, YUGA_SCALE_COLOR, getTag, formatToString, getDate, getCellAge, getYugaScale, IRON_ANCHOR, GOLDEN_ANCHOR, YUGA_SCALE, getCellAgeFromAngle, jsToYugaDeg, yugaToJsDeg, radToDeg, jsToYugaRad, yugaINDeg, yugaINRad, yugaToJsRad } from "@/lib/utils";
 
 import { YugaLinesSvg, SegmentBgSvg, OuterCircularTextSvg } from "./calendarSvg";
 import { SpiralCalendar } from "./spiralCalendar";
@@ -272,33 +272,39 @@ export const Calaendar = () => {
 
   const posX = pos.elementX * SVG_BOX / pos.width;
   const posY = pos.elementY * SVG_BOX / pos.height
-  const va = Math.atan2(posY - CENTER_Y, posX - CENTER_X);
-  const vad = va * 180 / Math.PI;
-  // base angle parseInt(yA / 18)}, {formatToString(yA % 18)
-  const uA = vad > 0 ? 360 - vad : -vad;
-  const dSeg = parseInt(uA / 18);
-  const dA = dSeg % 2 ? uA % 18 * 10 : uA % 18 * 10 + 180;
-  const d2Seg = parseInt((dA+90) / 18);
-  const d2A = d2Seg % 2 ? dA % 18 * 10 : dA % 18 * 10 + 180;
+  // const va = Math.atan2(posY - CENTER_Y, posX - CENTER_X);
+  // const vad = radToDeg(va);
+  // const uA = vad > 0 ? 360 - vad : -vad;
+  // const dSeg = parseInt(uA / 18);
+  // const dA = dSeg % 2 ? uA % 18 * 10 : uA % 18 * 10 + 180;
+  // const d2Seg = parseInt((dA+90) / 18);
+  // const d2A = d2Seg % 2 ? dA % 18 * 10 : dA % 18 * 10 + 180;
 
-  const dAs = [dA, d2A];
+  // const dAs = [dA, d2A];
+  const jsRad = Math.atan2(posY - CENTER_Y, posX - CENTER_X);
+  const yRad = jsToYugaRad(jsRad);
+  const yDeg = radToDeg(yRad);
+  const yIn = yugaINRad(yRad);
+  const yIn2 = yugaINRad(yIn);
 
+  const dAs = [yugaToJsRad(yIn), yugaToJsRad(yIn2)];
+  
   const getHoveredData = useCallback(() => {
     if (hoveredCell === null) return "";
     const y = masterData[getTag(factor)][hoveredCell];
-    const yr = y + (uA % 18) * (INC / 18 / factor);
+    const yr = y + (yDeg % 18) * (INC / 18 / factor);
     const {month, date, year} = getDate(yr);
     
     return (
       <>
-        {`${YUGA_SCALE[Math.log10(factor * 10)]} ${YUGA_NAME_MAP[getCellAgeFromAngle(dA)]}
+        {`${YUGA_SCALE[Math.log10(factor * 10)]} ${YUGA_NAME_MAP[getCellAgeFromAngle(radToDeg(yIn))]}
         ${year}
         ${month}
         ${formatToString(date, 2)}
         `}
       </>
       );
-  }, [masterData, hoveredCell, uA, factor, dA]);
+  }, [masterData, hoveredCell, yDeg, factor, yIn]);
 
   return (
     <div className="flex flex-col items-center justify-center p-4 max-h-screen max-w-screen bg-black text-white select-none">
@@ -310,7 +316,7 @@ export const Calaendar = () => {
         <SegmentBgSvg age="iron-age" />
 
         <OuterCircularTextSvg
-          radAngle={va}
+          radAngle={jsRad}
           text={getHoveredData()}
           textFill={"white"}
         />
@@ -327,8 +333,9 @@ export const Calaendar = () => {
 
         { Array.from(dAs, (da, i) => (
           <path
+            key={i}
             d={`M ${CENTER_X} ${CENTER_Y}
-            L ${CENTER_X + R2 * Math.cos(-(da+90) * Math.PI / 180)} ${CENTER_X + R2 * Math.sin(-(da+90) * Math.PI / 180)}`}
+            L ${CENTER_X + R2 * Math.cos(da)} ${CENTER_X + R2 * Math.sin(da)}`}
             stroke={YUGA_SCALE_COLOR[i]}
             strokeWidth="3"
           />)
@@ -356,10 +363,11 @@ export const Calaendar = () => {
         <div className="flex flex-col items-center justify-between w-20">
           {/* <span>{formatToString(posX)}</span>
           <span>{formatToString(posY)}</span> */}
-          <span>{formatToString(uA)}</span>
-          <span>{hoveredCell}</span>
+          <span>{formatToString(yDeg)}</span>
+          {/* <span>{formatToString(jsToYugaDeg(vad))}</span> */}
+          <span>{formatToString(jsToYugaDeg(yugaToJsDeg(yDeg)))}</span>
           {/* <span>{pos.width}, {pos.height}</span> */}
-          <span>{dSeg}, {formatToString(dA,1)}</span>
+          <span>{formatToString(yIn)}</span>
         </div>
         <div className="flex flex-col gap-2">
           {getJourneyInfo()}
