@@ -2,38 +2,50 @@ import React from "react";
 
 import { MONTH_MAP, YUGA_NAME_MAP, JOURNEY_MAP, YUGA_TAG, JOURNEY, GOLDEN_COLOR, SILVER_COLOR, BRONZE_COLOR, IRON_COLOR, GOLDEN_COLOR_SOLID, SILVER_COLOR_SOLID, BRONZE_COLOR_SOLID, IRON_COLOR_SOLID, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, INC, ANCHOR, ANCHOR_CELL, TURNS, SEGMENTS, CENTER_X, CENTER_Y, RADIUS, R1, R2, getYugaSvgData, getTag, formatToString, getDate, getCellAge } from "@/lib/utils";
 
+
+const GoldenText = ({ angle }) => {
+  return (
+    <text
+      transform={`translate(${CENTER_X + R2 * Math.cos(angle * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(angle * Math.PI / 180)}) rotate(${angle - 90})`}
+      textAnchor="middle"
+      fill={GOLDEN_COLOR_SOLID}
+      fontSize="7"
+      className="pointer-events-none font-bold"
+    >
+      <tspan x="-0.6em" dy="-0.5em">{JOURNEY_MAP.GU}</tspan>
+      <tspan x="0.7em" dy="0">{JOURNEY_MAP.GD}</tspan>
+    </text>
+  );
+}
+
+const IronText = ({ angle }) => {
+  return (
+    <text
+      transform={`translate(${CENTER_X + R2 * Math.cos(angle * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(angle * Math.PI / 180)}) rotate(${angle - 90})`}
+      textAnchor="middle"
+      fill={IRON_COLOR_SOLID}
+      fontSize="7"
+      className="pointer-events-none"
+    >
+      <tspan x="-0.4em" dy="-0.5em">{JOURNEY_MAP.ID}</tspan>
+      <tspan x="0.6em" dy="0">{JOURNEY_MAP.IU}</tspan>
+    </text>
+  );
+}
+
+const YugaText = ({ angle }) => {
+  return (
+    <>
+      <GoldenText angle={angle} />
+      <GoldenText angle={-angle} />
+      <IronText angle={angle-18} />
+      <IronText angle={-angle-18} />
+    </>
+  )
+}
+
 export const YugaLinesSvg = () => {
   const angles = [-234, -90, -306, -162, -18];
-
-  const getGoldenText = (a) => {
-    return (
-      <text
-        transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
-        textAnchor="middle"
-        fill={GOLDEN_COLOR_SOLID}
-        fontSize="7"
-        className="pointer-events-none font-bold"
-      >
-        <tspan x="-0.6em" dy="-0.5em">{JOURNEY_MAP.GU}</tspan>
-        <tspan x="0.7em" dy="0">{JOURNEY_MAP.GD}</tspan>
-      </text>
-    );
-  }
-
-  const getIronText = (a) => {
-    return (
-      <text
-        transform={`translate(${CENTER_X + R2 * Math.cos(a * Math.PI / 180)}, ${CENTER_Y + R2 * Math.sin(a * Math.PI / 180)}) rotate(${a - 90})`}
-        textAnchor="middle"
-        fill={IRON_COLOR_SOLID}
-        fontSize="7"
-        className="pointer-events-none"
-      >
-        <tspan x="-0.4em" dy="-0.5em">{JOURNEY_MAP.ID}</tspan>
-        <tspan x="0.6em" dy="0">{JOURNEY_MAP.IU}</tspan>
-      </text>
-    );
-  }
 
   return (
     <>
@@ -53,8 +65,8 @@ export const YugaLinesSvg = () => {
               key={i}
               x1={CENTER_X}
               y1={CENTER_Y}
-              x2={x2}
-              y2={y2}
+              x2={x2.toFixed(12)}
+              y2={y2.toFixed(12)}
               stroke={stroke}
               strokeWidth={strokeWidth}
               className="pointer-events-none"
@@ -69,7 +81,8 @@ export const YugaLinesSvg = () => {
           const rotate = i * 36;
 
           return (
-            <path 
+            <path
+              key={i} 
               d={`M ${CENTER_X + r * Math.cos((angles[0]+rotate) * Math.PI / 180)} ${CENTER_Y + r * Math.sin((angles[0]+rotate) * Math.PI / 180)}
                 L ${CENTER_X + r * Math.cos((angles[1]+rotate) * Math.PI / 180)} ${CENTER_Y + r * Math.sin((angles[1]+rotate) * Math.PI / 180)}
                 L ${CENTER_X + r * Math.cos((angles[2]+rotate) * Math.PI / 180)} ${CENTER_Y + r * Math.sin((angles[2]+rotate) * Math.PI / 180)}
@@ -83,13 +96,8 @@ export const YugaLinesSvg = () => {
         })
       }
 
-      { Array.from(angles, (a) => (
-          <>
-          {getGoldenText(a)}
-          {getGoldenText(-a)}
-          {getIronText(a-18)}
-          {getIronText(-a-18)}
-          </>
+      { Array.from(angles, (a, i) => (
+          <YugaText angle={a} key={i} />
         ))
       }
 
@@ -101,22 +109,32 @@ export const YugaLinesSvg = () => {
 
 
 export const SegmentBgSvg = ({age}) => {
-  let { up, down, segs, fill } = getYugaSvgData(age);
+  const { up, down, segs, fill } = getYugaSvgData(age);
+
+  const p1l1 = CENTER_X + RADIUS * Math.cos(-up * 2 * Math.PI / SEGMENTS);
+  const p1l2 = CENTER_Y + RADIUS * Math.sin(-up * 2 * Math.PI / SEGMENTS);
+  const p1a1 = CENTER_X + RADIUS * Math.cos(-(up + segs) * 2 * Math.PI / SEGMENTS);
+  const p1a2 = CENTER_Y + RADIUS * Math.sin(-(up + segs) * 2 * Math.PI / SEGMENTS);
+
+  const p2l1 = CENTER_X + RADIUS * Math.cos(-down * 2 * Math.PI / SEGMENTS);
+  const p2l2 = CENTER_Y + RADIUS * Math.sin(-down * 2 * Math.PI / SEGMENTS);
+  const p2a1 = CENTER_X + RADIUS * Math.cos(-(down + segs) * 2 * Math.PI / SEGMENTS);
+  const p2a2 = CENTER_Y + RADIUS * Math.sin(-(down + segs) * 2 * Math.PI / SEGMENTS);
   
   return (
     <>
     <path
       d={`M ${CENTER_X} ${CENTER_Y}
-        L ${CENTER_X + RADIUS * Math.cos(-up * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-up * 2 * Math.PI / SEGMENTS)}
-        A ${RADIUS} ${RADIUS} 0 0 0 ${CENTER_X + RADIUS * Math.cos(-(up + segs) * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-(up + segs) * 2 * Math.PI / SEGMENTS)}
+        L ${p1l1.toFixed(13)} ${p1l2.toFixed(13)}
+        A ${RADIUS} ${RADIUS} 0 0 0 ${p1a1.toFixed(13)} ${p1a2.toFixed(13)}
         Z`}
       fill={fill}
       strokeWidth="1"
     />
     <path
       d={`M ${CENTER_X} ${CENTER_Y}
-        L ${CENTER_X + RADIUS * Math.cos(-down * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-down * 2 * Math.PI / SEGMENTS)}
-        A ${RADIUS} ${RADIUS} 0 0 0 ${CENTER_X + RADIUS * Math.cos(-(down + segs) * 2 * Math.PI / SEGMENTS)} ${CENTER_Y + RADIUS * Math.sin(-(down + segs) * 2 * Math.PI / SEGMENTS)}
+        L ${p2l1.toFixed(13)} ${p2l2.toFixed(13)}
+        A ${RADIUS} ${RADIUS} 0 0 0 ${p2a1.toFixed(13)} ${p2a2.toFixed(13)}
         Z`}
       fill={fill}
       strokeWidth="1"

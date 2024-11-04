@@ -235,8 +235,8 @@ export const Calaendar = () => {
   const getJourneyInfo = useCallback(() => {
     return (
       <div className="flex flex-row gap-2 justify-between">
-        {Array.from(YUGA_TAG, (tag) => (
-          <div className="flex flex-col h-wrap w-full items-center justify-center p-2 bg-black rounded-md">
+        {Array.from(YUGA_TAG, (tag, i) => (
+          <div className="flex flex-col h-wrap w-full items-center justify-center p-2 bg-black rounded-md" key={i}>
             <span>{JOURNEY_MAP[journey[tag].age]}</span>
             <span>{formatToString(journey[tag].yr, 2)}</span>
           </div>
